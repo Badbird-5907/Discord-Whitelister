@@ -2,3 +2,4 @@ token: 'abc'
 server: 123
 whitelist-role: 123
 perms: 123
+mojang-api: true
