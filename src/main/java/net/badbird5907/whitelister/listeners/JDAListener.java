@@ -72,8 +72,11 @@ public class JDAListener extends ListenerAdapter {
                 }
                 user.setWhitelisted(true);
                 user.save();
-                event.replyEmbeds(new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true))
-                        .addField(new MessageEmbed.Field("User",member.getAsMention(),true)).build()).queue();
+                EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
+                if (member != null){
+                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),true));
+                }
+                event.replyEmbeds(builder.build()).queue();
             } else if (event.getCommandIdLong() == unwhitelist){
                 String player = event.getOption("player").getAsString();
                 Member member = null;
@@ -98,8 +101,11 @@ public class JDAListener extends ListenerAdapter {
                 }
                 user.setWhitelisted(false);
                 user.save();
-                event.replyEmbeds(new EmbedBuilder().setTitle("Unwhitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true))
-                        .addField(new MessageEmbed.Field("User",member.getAsMention(),true)).build()).queue();
+                EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
+                if (member != null){
+                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),true));
+                }
+                event.replyEmbeds(builder.build()).queue();
             }else {
                 event.reply("ur dumb lol").queue();
             }
