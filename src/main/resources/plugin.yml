@@ -1,0 +1,4 @@
+name: Whitelister
+version: '${project.version}'
+main: net.badbird5907.whitelister.Whitelister
+api-version: 1.18
