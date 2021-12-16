@@ -1,5 +1,6 @@
 package net.badbird5907.whitelister.listeners;
 
+import net.badbird5907.blib.util.Logger;
 import net.badbird5907.whitelister.Whitelister;
 import net.badbird5907.whitelister.manager.JDAManager;
 import net.badbird5907.whitelister.object.WhitelistedUser;
@@ -8,6 +9,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -114,5 +118,21 @@ public class JDAListener extends ListenerAdapter {
                 event.reply("ur dumb lol").queue();
             }
         }
+    }
+
+    @Override
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        if (event.getGuild().getIdLong() == Whitelister.getInstance().getConfig().getLong("guild")) {
+            WhitelistedUser user = Whitelister.getInstance().getStorageProvider().getWhitelistedUser(event.getUser().getIdLong());
+            if (user != null && user.getOfflinePlayer().isWhitelisted()) {
+                Logger.debug("Re-adding the whitelist role to " + event.getUser().getName() + " because they joined the server");
+                event.getGuild().addRoleToMember(event.getMember(), whitelistRole).queue();
+            }
+        }
+    }
+
+    @Override
+    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
+
     }
 }

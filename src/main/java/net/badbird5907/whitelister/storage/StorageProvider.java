@@ -14,5 +14,6 @@ public interface StorageProvider {
     void unWhitelistMember(UUID id);
     void unWhitelistMember(String mcName);
     WhitelistedUser getWhitelistedUser(OfflinePlayer player);
+    WhitelistedUser getWhitelistedUser(long discordId);
     void save(WhitelistedUser user);
 }

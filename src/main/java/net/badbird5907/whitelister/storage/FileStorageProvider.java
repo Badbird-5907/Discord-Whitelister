@@ -137,6 +137,21 @@ using gson
     }
 
     @Override
+    public WhitelistedUser getWhitelistedUser(long discordId) {
+        JsonObject fullData = getData();
+        JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
+        for (JsonElement element : whitelisted) {
+            JsonObject object = element.getAsJsonObject();
+            if (object.get("userId").getAsLong() == discordId){
+                WhitelistedUser user =  Whitelister.getGson().fromJson(object,WhitelistedUser.class);
+                user.onLoad();
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void save(WhitelistedUser user) {
         JsonObject data = Whitelister.getGson().toJsonTree(user).getAsJsonObject();
         JsonObject fullData = getData();

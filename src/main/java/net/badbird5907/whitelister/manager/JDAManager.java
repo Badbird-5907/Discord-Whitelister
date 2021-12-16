@@ -20,7 +20,6 @@ public class JDAManager {
         JDABuilder builder = JDABuilder.createDefault(Whitelister.getInstance().getConfig().getString("token"), GatewayIntent.GUILD_MEMBERS);
         builder.addEventListeners(new JDAListener());
         jda = builder.build();
-
     }
     public static Guild getGuild(){
         return jda.getGuildById(Whitelister.getInstance().getConfig().getLong("server"));
