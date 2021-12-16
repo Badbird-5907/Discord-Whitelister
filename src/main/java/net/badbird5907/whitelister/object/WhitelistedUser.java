@@ -75,6 +75,9 @@ public class WhitelistedUser {
     public String getName(){
         return getOfflinePlayer().getName();
     }
+    public String getCachedName(){
+        return name;
+    }
     public void save(){
         Whitelister.getInstance().getStorageProvider().save(this);
     }

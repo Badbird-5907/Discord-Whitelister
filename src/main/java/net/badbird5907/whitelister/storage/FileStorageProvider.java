@@ -60,65 +60,17 @@ using gson
     }
 
     @Override
-    public void whitelistMember(long userId, UUID uuid, String mcName) {
-        JsonObject data = new JsonObject();
-        data.addProperty("userId",userId);
-        data.addProperty("mcName",mcName);
-        data.addProperty("uuid",uuid.toString());
+    public WhitelistedUser[] getWhitelistedUsers() {
         JsonObject fullData = getData();
         JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
-        whitelisted.add(data);
-        fullData.remove("whitelisted");
-        fullData.add("whitelisted",whitelisted);
-        save(fullData);
-    }
-
-    @Override
-    public void unWhitelistMember(long id) {
-        JsonObject fullData = getData();
-        JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
-        for (JsonElement element : whitelisted) {
-            JsonObject object = element.getAsJsonObject();
-            if (object.get("userId").getAsLong() == id){
-                whitelisted.remove(element);
-                break;
-            }
+        WhitelistedUser[] users = new WhitelistedUser[whitelisted.size()];
+        for (int i = 0; i < whitelisted.size(); i++) {
+            JsonObject object = whitelisted.get(i).getAsJsonObject();
+            WhitelistedUser user =  Whitelister.getGson().fromJson(object,WhitelistedUser.class);
+            user.onLoad();
+            users[i] = user;
         }
-        fullData.remove("whitelisted");
-        fullData.add("whitelisted",whitelisted);
-        save(fullData);
-    }
-
-    @Override
-    public void unWhitelistMember(UUID id) {
-        JsonObject fullData = getData();
-        JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
-        for (JsonElement element : whitelisted) {
-            JsonObject object = element.getAsJsonObject();
-            if (object.get("uuid").getAsString() == id.toString()){
-                whitelisted.remove(element);
-                break;
-            }
-        }
-        fullData.remove("whitelisted");
-        fullData.add("whitelisted",whitelisted);
-        save(fullData);
-    }
-
-    @Override
-    public void unWhitelistMember(String mcName) {
-        JsonObject fullData = getData();
-        JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
-        for (JsonElement element : whitelisted) {
-            JsonObject object = element.getAsJsonObject();
-            if (object.get("mcName").getAsString().equalsIgnoreCase(mcName)){
-                whitelisted.remove(element);
-                break;
-            }
-        }
-        fullData.remove("whitelisted");
-        fullData.add("whitelisted",whitelisted);
-        save(fullData);
+        return users;
     }
 
     @Override

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 public class JDAManager {
     @Getter
     private static JDA jda;
-    public static long whitelist, unwhitelist;
+    public static long whitelist, unwhitelist,list;
     public static Role permsRole,whitelistRole;
     @SneakyThrows
     public static void init(){

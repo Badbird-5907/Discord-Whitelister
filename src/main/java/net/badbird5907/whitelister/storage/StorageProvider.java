@@ -9,11 +9,8 @@ public interface StorageProvider {
     void init();
     int getTotalWhitelisted();
     long[] getWhitelistedIds();
-    void whitelistMember(long userId, UUID uuid,String mcName);
-    void unWhitelistMember(long id);
-    void unWhitelistMember(UUID id);
-    void unWhitelistMember(String mcName);
     WhitelistedUser getWhitelistedUser(OfflinePlayer player);
     WhitelistedUser getWhitelistedUser(long discordId);
+    WhitelistedUser[] getWhitelistedUsers();
     void save(WhitelistedUser user);
 }

@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.badbird5907.whitelister.manager.JDAManager.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -42,6 +45,12 @@ public class JDAListener extends ListenerAdapter {
                 .addOption(OptionType.BOOLEAN,"silent","Whether the command is silent",false).queue(command ->{
                     unwhitelist = command.getIdLong();
                 });
+        JDAManager.getJda().getGuildById(Whitelister.getInstance().getConfig().getLong("server"))
+                .upsertCommand("listwhitelist","list whitelisted players")
+                .addOption(OptionType.BOOLEAN,"ignorecache","Ignores the cached player name and (potentially) fetches the name from mojang API",false)
+                .addOption(OptionType.BOOLEAN,"silent","Whether the command is silent",false).queue(command ->{
+                    list = command.getIdLong();
+                });
         permsRole = JDAManager.getJda().getGuildById(Whitelister.getInstance().getConfig().getLong("server")).getRoleById(Whitelister.getInstance().getConfig().getLong("perms"));
         whitelistRole = JDAManager.getJda().getGuildById(Whitelister.getInstance().getConfig().getLong("server")).getRoleById(Whitelister.getInstance().getConfig().getLong("whitelist-role"));
     }
@@ -56,9 +65,14 @@ public class JDAListener extends ListenerAdapter {
             if (event.getCommandIdLong() == whitelist){
                 String player = event.getOption("player").getAsString();
                 OptionMapping memberMapping = event.getOption("discord");
+                OptionMapping silentMapping = event.getOption("silent");
                 Member member = null;
+                boolean silent = false;
                 if (memberMapping != null) {
                     member = memberMapping.getAsMember();
+                }
+                if (silentMapping != null) {
+                    silent = silentMapping.getAsBoolean();
                 }
                 OfflinePlayer offlinePlayer;
                 if (uuidRegex.matcher(player).matches()){
@@ -78,17 +92,22 @@ public class JDAListener extends ListenerAdapter {
                     user.setUserId(member.getIdLong());
                 user.setWhitelisted(true);
                 user.save();
-                EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
+                EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),false)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),false));
                 if (member != null){
-                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),true));
+                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),false));
                 }
-                event.replyEmbeds(builder.build()).queue();
+                event.replyEmbeds(builder.build()).setEphemeral(silent).queue();
             } else if (event.getCommandIdLong() == unwhitelist){
                 String player = event.getOption("player").getAsString();
                 Member member = null;
                 OptionMapping memberMapping = event.getOption("discord");
+                OptionMapping silentMapping = event.getOption("silent");
+                boolean silent = false;
                 if (memberMapping != null) {
                     member = memberMapping.getAsMember();
+                }
+                if (silentMapping != null) {
+                    silent = silentMapping.getAsBoolean();
                 }
                 OfflinePlayer offlinePlayer;
                 if (uuidRegex.matcher(player).matches()){
@@ -109,12 +128,36 @@ public class JDAListener extends ListenerAdapter {
                     user.setUserId(member.getIdLong());
                 user.setWhitelisted(false);
                 user.save();
-                EmbedBuilder builder = new EmbedBuilder().setTitle("Un-Whitelist").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
+                EmbedBuilder builder = new EmbedBuilder().setTitle("Un-Whitelist").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),false)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),false));
                 if (member != null){
-                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),true));
+                    builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),false));
                 }
-                event.replyEmbeds(builder.build()).queue();
-            }else {
+                event.replyEmbeds(builder.build()).setEphemeral(silent).queue();
+            }else if (event.getCommandIdLong() == list){
+                OptionMapping silentMapping = event.getOption("silent");
+                boolean silent = false;
+                if (silentMapping != null) {
+                    silent = silentMapping.getAsBoolean();
+                }
+                OptionMapping ignoreCacheMapping = event.getOption("ignorecache");
+                boolean ignoreCache = false;
+                if (ignoreCacheMapping != null) {
+                    ignoreCache = ignoreCacheMapping.getAsBoolean();
+                }
+                List<WhitelistedUser> users = Arrays.asList(Whitelister.getInstance().getStorageProvider().getWhitelistedUsers());
+                List<MessageEmbed> embeds = new ArrayList<>();
+                for (WhitelistedUser user : users) {
+                    EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted")
+                            .addField(new MessageEmbed.Field("Name" + (!ignoreCache ? " (cached)" : ""),(ignoreCache ? user.getName() : user.getCachedName()),false))
+                            .addField(new MessageEmbed.Field("UUID",user.getOfflinePlayer().getUniqueId().toString(),false));
+                    if (user.getUserId() != -1){
+                        builder.addField(new MessageEmbed.Field("Discord","<@" + user.getUserId() + ">",false));
+                    }
+                    embeds.add(builder.build());
+                }
+                event.replyEmbeds(embeds).setEphemeral(silent).queue();
+            }
+            else {
                 event.reply("ur dumb lol").queue();
             }
         }
