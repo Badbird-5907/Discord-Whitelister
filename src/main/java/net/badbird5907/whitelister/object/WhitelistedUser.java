@@ -42,16 +42,16 @@ public class WhitelistedUser {
     public void setWhitelisted(boolean whitelist){
         if(whitelist){
             getOfflinePlayer().setWhitelisted(true);
-            if (userId > 1)
+            if (userId < 1)
                 return;
-            getMember().thenAcceptAsync((m)->{
+            getMember().thenAcceptAsync((m)-> {
                 JDAManager.getGuild().addRoleToMember(m,JDAManager.whitelistRole).queue();
             });
         }else{
             getOfflinePlayer().setWhitelisted(false);
-            if (userId > 1)
+            if (userId < 1)
                 return;
-            getMember().thenAcceptAsync((m)->{
+            getMember().thenAcceptAsync((m)-> {
                 JDAManager.getGuild().removeRoleFromMember(m,JDAManager.whitelistRole).queue();
             });
         }

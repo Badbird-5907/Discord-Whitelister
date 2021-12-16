@@ -18,7 +18,7 @@ public class FileStorageProvider implements StorageProvider{ //haha shitty code 
     private File file;
     @Override
     public void init() {
-        file = new File(Whitelister.getInstance().getDataFolder() + "/data-schema.json");
+        file = new File(Whitelister.getInstance().getDataFolder() + "/data.json");
         if (!file.exists()){
             try {
                 file.createNewFile();
@@ -127,7 +127,7 @@ using gson
         JsonArray whitelisted = fullData.getAsJsonArray("whitelisted");
         for (JsonElement element : whitelisted) {
             JsonObject object = element.getAsJsonObject();
-            if (object.get("uuid").getAsString() == player.getUniqueId().toString()){
+            if (object.get("uuid").getAsString().equalsIgnoreCase(player.getUniqueId().toString())){
                 WhitelistedUser user =  Whitelister.getGson().fromJson(object,WhitelistedUser.class);
                 user.onLoad();
                 return user;

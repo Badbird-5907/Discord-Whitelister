@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class JDAManager {
     @Getter
@@ -16,9 +17,10 @@ public class JDAManager {
     public static Role permsRole,whitelistRole;
     @SneakyThrows
     public static void init(){
-        JDABuilder builder = JDABuilder.createDefault(Whitelister.getInstance().getConfig().getString("token"));
+        JDABuilder builder = JDABuilder.createDefault(Whitelister.getInstance().getConfig().getString("token"), GatewayIntent.GUILD_MEMBERS);
         builder.addEventListeners(new JDAListener());
         jda = builder.build();
+
     }
     public static Guild getGuild(){
         return jda.getGuildById(Whitelister.getInstance().getConfig().getLong("server"));

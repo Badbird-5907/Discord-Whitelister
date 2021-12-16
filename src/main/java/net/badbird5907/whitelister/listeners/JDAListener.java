@@ -70,6 +70,8 @@ public class JDAListener extends ListenerAdapter {
                 if (user == null) {
                     user = new WhitelistedUser(offlinePlayer,(member == null ? -1 : member.getIdLong()));
                 }
+                if (member != null)
+                    user.setUserId(member.getIdLong());
                 user.setWhitelisted(true);
                 user.save();
                 EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
@@ -99,9 +101,11 @@ public class JDAListener extends ListenerAdapter {
                 if (user == null) {
                     user = new WhitelistedUser(offlinePlayer,(member == null ? -1 : member.getIdLong()));
                 }
+                if (member != null)
+                    user.setUserId(member.getIdLong());
                 user.setWhitelisted(false);
                 user.save();
-                EmbedBuilder builder = new EmbedBuilder().setTitle("Whitelisted").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
+                EmbedBuilder builder = new EmbedBuilder().setTitle("Un-Whitelist").addField(new MessageEmbed.Field("Name",offlinePlayer.getName(),true)).addField(new MessageEmbed.Field("UUID",offlinePlayer.getUniqueId().toString(),true));
                 if (member != null){
                     builder.addField(new MessageEmbed.Field("Discord",member.getAsMention(),true));
                 }
